@@ -1,6 +1,5 @@
 var core = require('./core')
 
-
 const games = {};
 
 module.exports = {

@@ -35,7 +35,9 @@ module.exports=class LogicGrid {
         }
     }
 
-    clone() { return new LogicGrid(this); }
+    clone() { 
+        return new LogicGrid(this); 
+    }
 
     cell(x, y) {
         return this.cells[y]?.[x] || { knownSafe: true, revealed: true };
