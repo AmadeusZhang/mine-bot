@@ -1,4 +1,4 @@
-module.exports=class LogicGrid {
+module.exports = class LogicGrid {
 
     constructor(col, row, mineCount) {
         if (!row) {
