@@ -40,7 +40,22 @@ module.exports = class LogicGrid {
     }
 
     cell(x, y) {
-        return this.cells[y]?.[x] || { knownSafe: true, revealed: true };
+        return ( this.cells[y] ?. [x] ) || { knownSafe: true, revealed: true };
+        /*
+
+        JavaScript operator: logical OR (||)
+        ... so if this operator is used with non-Boolean values, it will return a non-Boolean value.
+
+        JavaScript operator: Optional chaining (?.)
+        The ?. operator is like the . chaining operator, except that instead of causing an error if a reference is nullish
+        (null or undefined), the expression short-circuits with a return value of undefined. When used with function calls,
+        it returns undefined if the given function does not exist.
+
+        comments:
+            if x is defined: returns cell[y].[x]
+            else returns a couple of true, so marks this cell as safe
+
+        */
     }
 
     // todo: collapse into neighbourCells?
