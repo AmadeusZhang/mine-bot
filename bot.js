@@ -29,7 +29,6 @@ const bot = new TelegramBot(token, {
     //request: {proxy:"http://127.0.0.1:8000"}
 });
 
-
 bot.onText(/^\/start/,(msg, match) => {
     bot.sendMessage(
         msg.chat.id,
@@ -58,7 +57,9 @@ bot.onText(/^\/mine(@\w+)?(?: (\d+) (\d+) (\d+))?$/, (msg, match) => {
         row = parseInt(match[2], 10) || 8
         col = parseInt(match[3], 10) || 8
         count = parseInt(match[4], 10) || 12
+
         let errorMsg = util.validate(row, col, count)
+
         if (errorMsg !== null) {
             bot.editMessageText(
                 errorMsg,
@@ -71,10 +72,14 @@ bot.onText(/^\/mine(@\w+)?(?: (\d+) (\d+) (\d+))?$/, (msg, match) => {
             return
         }
 
+        // case: errMsg == null
+
+        // return a map
         mineCore = game.gameInit(sentmsg.chat.id + '_' + sentmsg.message_id,row,col,count)
 
         bot.editMessageReplyMarkup(
-            {
+            {   
+                // event: player click on map generated
                 inline_keyboard: util.coreToKeyboard(mineCore,null),
             },
             {
@@ -92,23 +97,49 @@ bot.on('callback_query', (query) => {
 
     gameId = msg.chat.id + '_' + msg.message_id
 
+    try {
+        const info = JSON.parse(query.data);
+    } catch (e) {
+        throw Error("json error");
+    }
+
     const info = JSON.parse(query.data);
 
     if (typeof info[0] !== 'number' || typeof info[1] !== 'number') {
-
         throw Error(JSON.stringify(query));
     }
-    lock.acquire(gameId, function(done) {
-        if(!game.getGame(gameId)){
-            done("no error", "ok");
+    
+    lock.acquire(gameId, function (done) {
+        bot.answerCallbackQuery(query.id).catch((err) => {
+            // nothing
+        });
+
+        if (!game.getGame(gameId)) {
+            done(new Error("not can found game"));
+            return
+        }
+
+        try {
+            var result = game.gameClick(msg.chat.id + '_' + msg.message_id, info[0], info[1])
+        } catch (err) {
+            bot.sendMessage(
+                msg.chat.id,
+                err.msg,
+                {
+                    reply_to_message_id: msg.message_id,
+                }
+            );
+            done(err);
             return
         }
 
         // 游戏已经结束或者点击已经打开/标记的格子
-        if(result === null){
+        if (result === null) {
+            /*
             bot.answerCallbackQuery(query.id).catch((err) => {
                 // nothing
             });
+            */
             done("no error", "ok");
             return
         }
@@ -132,7 +163,7 @@ bot.on('callback_query', (query) => {
                     reply_to_message_id: msg.message_id,
                 }
             );
-        }else  if(win  === -1){
+        } else  if (win === -1) {
             username =  query.from.username || query.from.first_name;
             bot.editMessageReplyMarkup(
                 {
@@ -190,4 +221,3 @@ bot.on('callback_query', (query) => {
 })
 
 bot.on("polling_error", console.log);
-

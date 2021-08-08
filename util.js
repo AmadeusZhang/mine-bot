@@ -11,7 +11,9 @@ module.exports = {
         }
         return null;
     },
+
     coreToKeyboard: function (core,boom) {
+        // with CONST I want to declare something not changeable
         const matrix = [];
 
         for (let i = 0; i < core.height; i += 1) {
@@ -40,6 +42,3 @@ module.exports = {
         return matrix;
     }
 }
-
-
-

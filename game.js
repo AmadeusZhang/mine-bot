@@ -7,6 +7,7 @@ module.exports = {
     getGame: function () {
         return games
     },
+
     gameInit: function gameInit(id, row, col, count) {
         games[id] = {
             row: row,
@@ -19,9 +20,11 @@ module.exports = {
         games[id].map = c
         return games[id].map
     },
+
     haveGame: function (id){
       return  games[id] !== undefined;
     },
+
     gameClick: function gameClick(id, x, y) {
 
         // 游戏已经完成
@@ -77,6 +80,7 @@ module.exports = {
         return mineCore
 
     },
+    
     isGameWin: function isGameWin(id) {
         let lost = games[id].map.failed
         if (lost) {
